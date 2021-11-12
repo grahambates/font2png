@@ -42,8 +42,6 @@ def doOutput(fontfile, outfile, size, width, height, leftalign, monochrome, defs
 		letterImg = Image.new(mode, (width,height), color=bg)
 		draw = ImageDraw.Draw(letterImg)
 		draw.text((xpos, height/2), chr(letter), anchor=anch, fill=fg, font=fnt)
-		if not quantise == 0:
-			letterImg = letterImg.quantize(quantise)
 		img.paste(letterImg, (0,i*height))
 		if defs:
 			let2col = letterImg if monochrome else letterImg.convert(mode='1')
@@ -56,6 +54,9 @@ def doOutput(fontfile, outfile, size, width, height, leftalign, monochrome, defs
 				else:
 					widths.append(bbox[2]-bbox[0]+1)
 		i += 1
+
+	if not quantise == 0:
+		img = img.quantize(quantise).convert(mode='P', colors=quantise)
 
 	img.save(outfile, "PNG")
 
