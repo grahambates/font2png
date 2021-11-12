@@ -22,7 +22,8 @@ def showHelp():
 	print("  --mono                    (-m) - output as monochrome")
 	print("  --defines                 (-d) - output letter widths to stdout")
 	print("  --quantise=<num. colours> (-q) - quantise colours to number specified")
-	print("  --index=<face index>      (-i) - which font face to load (default first available face)")
+	print("  --index=<face index/name> (-i) - which font face to load (default first available face)")
+	print("  --list                    (-z) - list available font faces")
 	print("  --help                    (-h) - show usage")
 	print()
 
@@ -79,9 +80,11 @@ def main(argv):
 	quant = 0
 	quantOpt = False
 	index = 0
+	indexArg = ""
+	listFaces = False
 
 	try:
-		opts, args = getopt.getopt(argv,"hf:o:ls:w:y:mdq:i:",["font=","output=","left-align","size=","width=","height=","mono","defines","quantise=","index=","help"])
+		opts, args = getopt.getopt(argv,"hf:o:ls:w:y:mdq:i:z",["font=","output=","left-align","size=","width=","height=","mono","defines","quantise=","index=","help","list"])
 	except getopt.GetoptError as err:
 		showHelp()
 		print(err)
@@ -110,7 +113,9 @@ def main(argv):
 			quant = int(arg)
 			quantOpt = True
 		elif opt in ("-i", "--index"):
-			index = int(arg)
+			indexArg = arg
+		elif opt in ("-z", "--list"):
+			listFaces = True
 	if width == 0:
 		width = math.ceil(size/8)*8
 	if height == 0:
@@ -119,6 +124,10 @@ def main(argv):
 		showHelp()
 		print("Must specify font file!")
 		sys.exit(2)
+	if listFaces:
+		faces = getFaces(fontfile)
+		printFaces(faces)
+		sys.exit()
 	if outputfile == "":
 		showHelp()
 		print("Must specify output file!")
@@ -139,8 +148,33 @@ def main(argv):
 		showHelp()
 		print("Quantise must be in the range 2 to 255!")
 		sys.exit(2)
+	if indexArg != "":
+		faces = getFaces(fontfile)
+		if indexArg.isnumeric() and int(indexArg) in faces.values():
+			index = int(indexArg)
+		elif indexArg in faces.keys():
+			index = faces.get(indexArg)
+		else:
+			print("Invalid face index/name: " + indexArg)
+			printFaces(faces)
+			sys.exit(2)
 
 	doOutput(fontfile,outputfile,size,width,height,alignleft,monochrome,defs,quant,index)
+
+def getFaces(fontfile):
+	faces = {}
+	for i in range(0,100):
+		try:
+			fnt = ImageFont.truetype(fontfile, 16, i)
+			name = fnt.getname()[1]
+			faces[name] = i
+		except:
+			break
+	return faces
+
+def printFaces(faces):
+	for name in faces.keys():
+		print(str(faces.get(name)) + ": " + name)
 
 if __name__ == "__main__":
 	main(sys.argv[1:])

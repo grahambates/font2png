@@ -15,7 +15,8 @@ font2png -f <font file> -o <output file> -s <size> -w <width> -y <height> -l -m 
   --mono                    (-m) - output as monochrome
   --defines                 (-d) - output letter widths to stdout
   --quantise=<num. colours> (-q) - quantise colours to number specified
-  --index=<face index>      (-i) - which font face to load (default first available face)
+  --index=<face index/name> (-i) - which font face to load (default first available face)
+  --list                    (-z) - list available font faces
   --help                    (-h) - show usage
 
 ```
